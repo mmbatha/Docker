@@ -15,7 +15,7 @@ EXPOSE 443 80 22
 ENTRYPOINT gitlab-ctl reconfigure & /opt/gitlab/embedded/bin/runsvdir-start
 
 ### Build container
-# docker build -t ex03 . > output.txt
+# docker build -t ex03 .
 
 ### Run
 # docker run -it --rm -p 8080:80 -p 8022:22 -p 8443:443 --privileged ex03

@@ -28,7 +28,7 @@ WORKDIR $TS3DIR
 ENTRYPOINT ["sh", "ts3server_minimal_runscript.sh"]
 
 ### Build server
-# docker build --tag=ex01
+# docker build -t ex01 .
 ### Run
 # docker run -dit --init --rm --name ts3 -p 9987:9987/udp -p 10011:10011 -p 30033:30033 ex01
 ### Launch Teamspeak Client and Connect to 192.168.99.100:9877
