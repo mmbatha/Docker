@@ -60,6 +60,6 @@ CMD ["/usr/local/bin/wrapper"]
 # docker run -d -h 0.0.0.0:8080 -p 8443:443 -p 8080:80 -p 8022:22 --name gitlab --restart always -v /srv/gitlab/config:/etc/gitlab -v /srv/gitlab/logs:/var/log/gitlab -v /srv/gitlab/data:/var/opt/gitlab ex03
 
 ### Genuine Gitlab image
-# docker run -d -h 0.0.0.0:8080 -p 8443:443 -p 8022:22 -p 8080:80 --name gitlab04 --restart always -v /srv/gitlab/config:/etc/gitlab -v /srv/gitlab/logs:/var/log/gitlab -v /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest
+# docker run --detach --hostname 192.168.99.101 --env GITLAB_OMNIBUS_CONFIG="external_url 'http://192.168.99.101/'; gitlab_rails['lfs_enabled'] = true; grafana['enable'] = false; gitlab_rails['gitlab_shell_ssh_port'] = 23" --publish 192.168.99.101:443:443 --publish 192.168.99.101:80:80 --publish 192.168.99.101:23:22 --name gitlab --restart always --volume /srv/gitlab/config:/etc/gitlab --volume /srv/gitlab/logs:/var/log/gitlab --volume /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest
 
-# docker run --detach --hostname gitlab.example.com --env GITLAB_OMNIBUS_CONFIG="external_url 'http://0.0.0.0:8080/'; gitlab_rails['lfs_enabled'] = true;" --publish 443:443 --publish 80:80 --publish 22:22 --name gitlab --restart always --volume /srv/gitlab/config:/etc/gitlab --volume /srv/gitlab/logs:/var/log/gitlab --volume /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest
+### Prove that Dockerfile produces same error as original image
