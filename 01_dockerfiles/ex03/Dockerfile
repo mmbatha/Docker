@@ -1,12 +1,17 @@
 FROM ubuntu:14.04
 
+ARG  DEBIAN_FRONTEND=noninteractive
+
+LABEL author="mmbatha@student.42.fr"
+
 # Install required packages
 RUN apt-get update -q \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+    && apt-get install -yq --no-install-recommends \
       ca-certificates \
       openssh-server \
       wget \
       apt-transport-https \
+	  apt-utils \
       vim \
       nano
 
@@ -56,3 +61,5 @@ CMD ["/usr/local/bin/wrapper"]
 
 ### Genuine Gitlab image
 # docker run -d -h 0.0.0.0:8080 -p 8443:443 -p 8022:22 -p 8080:80 --name gitlab04 --restart always -v /srv/gitlab/config:/etc/gitlab -v /srv/gitlab/logs:/var/log/gitlab -v /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest
+
+# docker run --detach --hostname gitlab.example.com --env GITLAB_OMNIBUS_CONFIG="external_url 'http://0.0.0.0:8080/'; gitlab_rails['lfs_enabled'] = true;" --publish 443:443 --publish 80:80 --publish 22:22 --name gitlab --restart always --volume /srv/gitlab/config:/etc/gitlab --volume /srv/gitlab/logs:/var/log/gitlab --volume /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest

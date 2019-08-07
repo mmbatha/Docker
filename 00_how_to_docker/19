@@ -1,7 +1,7 @@
 docker run -it --name Abathur -v $HOME:/root -p 3000:3000 python:2-slim bash
 
 ### In the container :
-# apt-get update && apt-get upgrade -y && apt-get install vim -y
+# apt-get update && apt-get upgrade -y && apt-get install vim python3 apt-utils -y
 # pip install Flask
 # vim /root/hello.py
 
