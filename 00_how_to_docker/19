@@ -1,8 +1,9 @@
 docker run -it --name Abathur -v $HOME:/root -p 3000:3000 python:2-slim bash
 
 ### In the container :
-# apt-get update && apt-get upgrade -y && apt-get install vim python3 apt-utils -y
+# apt-get update && apt-get upgrade -y && apt-get install vim -y
 # pip install Flask
+# pip install --upgrade pip
 # vim /root/hello.py
 
 ### In the hello.py file :
@@ -11,7 +12,7 @@ docker run -it --name Abathur -v $HOME:/root -p 3000:3000 python:2-slim bash
 #
 # @app.route("/")
 # def hello():
-#     html = "<!DOCTYPE html><html><head><title>Hello</title></head><body><h1>Hello World</h1></body></html>"
+#     html = "<!DOCTYPE html><html><head><title>Docker Eval</title></head><body><h1>Hello World!</h1></body></html>"
 #     return html
 #
 # if __name__ == "__main__":

@@ -1,65 +1,26 @@
-FROM ubuntu:14.04
+FROM	ubuntu:16.04
 
-ARG  DEBIAN_FRONTEND=noninteractive
+LABEL	Author="Monde MBATHA <mmbatha@student.42.fr>" \
+		Description="Ubuntu-based container that installs and runs Gitlab" \
+		License="MIT License 2.0" \
+		Usage="docker run -it --rm 80:80 -p 21:22 --privileged ex03"
 
-LABEL author="mmbatha@student.42.fr"
+RUN apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends ca-certificates openssh-server curl postfix && curl -LO https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh && bash script.deb.sh && apt-get update && EXTERNAL_URL="http://192.168.99.100/" apt-get install -yq --no-install-recommends gitlab-ce && apt update && apt install -y tzdata && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install required packages
-RUN apt-get update -q \
-    && apt-get install -yq --no-install-recommends \
-      ca-certificates \
-      openssh-server \
-      wget \
-      apt-transport-https \
-	  apt-utils \
-      vim \
-      nano
+EXPOSE 22 80
 
-# Download & Install GitLab
-# If you run GitLab Enterprise Edition point it to a location where you have downloaded it.
-RUN echo "deb https://packages.gitlab.com/gitlab/gitlab-ce/ubuntu/ `lsb_release -cs` main" > /etc/apt/sources.list.d/gitlab_gitlab-ce.list
-RUN wget -q -O - https://packages.gitlab.com/gpg.key | apt-key add -
-RUN apt-get update && apt-get install -yq --no-install-recommends gitlab-ce
+RUN echo "/opt/gitlab/embedded/bin/runsvdir-start& EXTERNAL_URL=\"0.0.0.0\" && gitlab-ctl reconfigure\n\ntail -f /dev/null" > /entrypoint.sh && chmod +x /entrypoint.sh
 
-# Manage SSHD through runit
-RUN mkdir -p /opt/gitlab/sv/sshd/supervise \
-    && mkfifo /opt/gitlab/sv/sshd/supervise/ok \
-    && printf "#!/bin/sh\nexec 2>&1\numask 077\nexec /usr/sbin/sshd -D" > /opt/gitlab/sv/sshd/run \
-    && chmod a+x /opt/gitlab/sv/sshd/run \
-    && ln -s /opt/gitlab/sv/sshd /opt/gitlab/service \
-    && mkdir -p /var/run/sshd
-
-# Disabling use DNS in ssh since it tends to slow connecting
-RUN echo "UseDNS no" >> /etc/ssh/sshd_config
-
-# Prepare default configuration
-RUN ( \
-  echo "" && \
-  echo "# Docker options" && \
-  echo "# Prevent Postgres from trying to allocate 25% of total memory" && \
-  echo "postgresql['shared_buffers'] = '1MB'" ) >> /etc/gitlab/gitlab.rb && \
-  mkdir -p /assets/ && \
-  cp /etc/gitlab/gitlab.rb /assets/gitlab.rb
-
-# Expose web & ssh
-EXPOSE 443 80 22
-
-# Define data volumes
-VOLUME ["/etc/gitlab", "/var/opt/gitlab", "/var/log/gitlab"]
-
-# Copy assets
-COPY assets/wrapper /usr/local/bin/
-
-# Wrapper to handle signal, trigger runit and reconfigure GitLab
-CMD ["/usr/local/bin/wrapper"]
+CMD [ "bash", "/entrypoint.sh" ]
 
 ### Build container
 # docker build -t ex03 .
 
-### Run
-# docker run -d -h 0.0.0.0:8080 -p 8443:443 -p 8080:80 -p 8022:22 --name gitlab --restart always -v /srv/gitlab/config:/etc/gitlab -v /srv/gitlab/logs:/var/log/gitlab -v /srv/gitlab/data:/var/opt/gitlab ex03
+### Run container
+# docker run -it --rm 80:80 -p 21:22 --privileged ex03
 
-### Genuine Gitlab image
-# docker run --detach --hostname 192.168.99.101 --env GITLAB_OMNIBUS_CONFIG="external_url 'http://192.168.99.101/'; gitlab_rails['lfs_enabled'] = true; grafana['enable'] = false; gitlab_rails['gitlab_shell_ssh_port'] = 23" --publish 192.168.99.101:443:443 --publish 192.168.99.101:80:80 --publish 192.168.99.101:23:22 --name gitlab --restart always --volume /srv/gitlab/config:/etc/gitlab --volume /srv/gitlab/logs:/var/log/gitlab --volume /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest
+### Run original container
+# docker run -d --privileged -h 192.168.99.100 -e GITLAB_OMNIBUS_CONFIG="external_url 'http://192.168.99.100/'; gitlab_rails['lfs_enabled'] = true; grafana['enable'] = false; gitlab_rails['gitlab_shell_ssh_port'] = 23;" -p 192.168.99.100:443:443 -p 192.168.99.100:80:80 -p 192.168.99.100:23:22 --name gitlab --restart always -v /srv/gitlab/config:/etc/gitlab -v /srv/gitlab/logs:/var/log/gitlab -v /srv/gitlab/data:/var/opt/gitlab -v /srv/gitlab/logs/reconfigure:/var/log/gitlab/reconfigure gitlab/gitlab-ce:11.10.8-ce.0
 
-### Prove that Dockerfile produces same error as original image
+### Test Dockerfile
+# docker run --rm -it ubuntu:14.04 /bin/sh
