@@ -1,2 +1,5 @@
 01_dockerfiles/.DS_Store
 output.txt
+02_bonus/ex00/myapp
+01_dockerfiles/ex02/sample_app
+01_dockerfiles/railsdir/app
