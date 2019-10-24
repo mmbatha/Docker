@@ -5,7 +5,7 @@ LABEL	Author="Monde MBATHA <mmbatha@student.42.fr>" \
 		License="MIT License 2.0" \
 		Usage="docker run -it --rm 80:80 -p 21:22 --privileged ex03"
 
-RUN apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends ca-certificates openssh-server curl postfix && curl -LO https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh && bash script.deb.sh && apt-get update && EXTERNAL_URL="http://192.168.99.100/" apt-get install -yq --no-install-recommends gitlab-ce && apt update && apt install -y tzdata && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends ca-certificates openssh-server curl postfix && curl -LO https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh && bash script.deb.sh && apt-get update && EXTERNAL_URL="http://192.168.99.102/" apt-get install -yq --no-install-recommends gitlab-ce && apt-get update && apt-get install -y tzdata && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 EXPOSE 22 80
 
