@@ -1,0 +1,122 @@
+version: "3"
+services:
+  lair:
+    command:
+      - apache2-foreground
+    container_name: lair
+    entrypoint:
+      - docker-entrypoint.sh
+    environment:
+      - WORDPRESS_DB_USER=root
+      - WORDPRESS_DB_PASS=Kerrigan
+      - WORDPRESS_DB_HOST=mysql
+      - MYSQL_PORT_3306_TCP=3306
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - 'PHPIZE_DEPS=autoconf           dpkg-dev                file            g++             gcc        libc-dev                 make            pkg-config
+                        re2c'
+      - PHP_INI_DIR=/usr/local/etc/php
+      - APACHE_CONFDIR=/etc/apache2
+      - APACHE_ENVVARS=/etc/apache2/envvars
+      - PHP_EXTRA_BUILD_DEPS=apache2-dev
+      - 'PHP_EXTRA_CONFIGURE_ARGS=--with-apxs2 --disable-cgi'
+      - 'PHP_CFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64'
+      - 'PHP_CPPFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE
+        -D_FILE_OFFSET_BITS=64'
+      - 'PHP_LDFLAGS=-Wl,-O1 -Wl,--hash-style=both -pie'
+      - 'GPG_KEYS=CBAF69F173A0FEA4B537F470D66C9593118BCCB6 F38252826ACD957EF380D39F2F7956BC5DA04B5D'
+      - PHP_VERSION=7.3.10
+      - PHP_URL=https://www.php.net/get/php-7.3.10.tar.xz/from/this/mirror
+      - PHP_ASC_URL=https://www.php.net/get/php-7.3.10.tar.xz.asc/from/this/mirror
+      - PHP_SHA256=42f00a15419e05771734b7159c8d39d639b8a5a6770413adfa2615f6f923d906
+      - PHP_MD5=
+      - WORDPRESS_VERSION=5.2.4
+      - WORDPRESS_SHA1=9eb002761fc8b424727d8c9d291a6ecfde0c53b7
+    hostname: c949d0acc2d5
+    image: wordpress
+    ipc: private
+    links:
+      - /spawning-pool:/lair/mysql
+    logging:
+      driver: json-file
+      options: {}
+    mac_address: 02:42:ac:11:00:03
+    networks:
+      bridge:
+        aliases:
+    ports:
+      - 8080:80/tcp
+    working_dir: /var/www/html
+  roach-warden:
+    command:
+      - apache2-foreground
+    container_name: roach-warden
+    entrypoint:
+      - /docker-entrypoint.sh
+    environment:
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - 'PHPIZE_DEPS=autoconf           dpkg-dev                file            g++             gcc        libc-dev                 make            pkg-config
+                        re2c'
+      - PHP_INI_DIR=/usr/local/etc/php
+      - APACHE_CONFDIR=/etc/apache2
+      - APACHE_ENVVARS=/etc/apache2/envvars
+      - PHP_EXTRA_BUILD_DEPS=apache2-dev
+      - 'PHP_EXTRA_CONFIGURE_ARGS=--with-apxs2 --disable-cgi'
+      - 'PHP_CFLAGS=-fstack-protector-strong -fpic -fpie -O2'
+      - 'PHP_CPPFLAGS=-fstack-protector-strong -fpic -fpie -O2'
+      - 'PHP_LDFLAGS=-Wl,-O1 -Wl,--hash-style=both -pie'
+      - 'GPG_KEYS=1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F'
+      - PHP_VERSION=7.2.23
+      - PHP_URL=https://www.php.net/get/php-7.2.23.tar.xz/from/this/mirror
+      - PHP_ASC_URL=https://www.php.net/get/php-7.2.23.tar.xz.asc/from/this/mirror
+      - PHP_SHA256=74e045ec8ff26290db6a3688826dcdf43b87bc509e508e9cb76dab742804ca14
+      - PHP_MD5=
+      - VERSION=4.9.1
+      - URL=https://files.phpmyadmin.net/phpMyAdmin/4.9.1/phpMyAdmin-4.9.1-all-languages.tar.xz
+    hostname: f5413987af8f
+    image: phpmyadmin/phpmyadmin
+    ipc: private
+    labels:
+      version: 4.9.1
+    links:
+      - /spawning-pool:/roach-warden/db
+    logging:
+      driver: json-file
+      options: {}
+    mac_address: 02:42:ac:11:00:04
+    networks:
+      bridge:
+        aliases:
+    ports:
+      - 8081:80/tcp
+    working_dir: /var/www/html
+  spawning-pool:
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    container_name: spawning-pool
+    entrypoint:
+      - docker-entrypoint.sh
+    environment:
+      - MYSQL_ROOT_PASSWORD=Kerrigan
+      - MYSQL_DATABASE=zerglings
+      - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - GOSU_VERSION=1.7
+      - MYSQL_MAJOR=8.0
+      - MYSQL_VERSION=8.0.18-1debian9
+    hostname: ae38f93b7eaa
+    image: mysql
+    ipc: private
+    logging:
+      driver: json-file
+      options: {}
+    mac_address: 02:42:ac:11:00:02
+    networks:
+      bridge:
+        aliases:
+    ports:
+      - 3306:3306/tcp
+    restart: on-failure
+    volumes:
+      - hatchery:/var/run/mysqld
+networks:
+  bridge:
+    external: true
