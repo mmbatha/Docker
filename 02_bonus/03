@@ -1,0 +1,1 @@
+docker run -d --link $(pwd)/app:/var/www/html --name rush00_app -p 8080:80 --link rush00_server:mysql php:apache

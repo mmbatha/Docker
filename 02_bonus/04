@@ -1,0 +1,1 @@
+docker run -d --name dat_admin -p 8081:80 --link rush00_server:db phpmyadmin/phpmyadmin

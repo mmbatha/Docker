@@ -3,8 +3,7 @@ docker run -it --name Abathur -v $HOME:/root -p 3000:3000 python:2-slim bash
 ### In the container :
 # apt-get update && apt-get upgrade -y && apt-get install vim -y
 # pip install Flask
-# pip install --upgrade pip
-# vim /root/hello.py
+# vi /root/hello.py
 
 ### In the hello.py file :
 # from flask import Flask
